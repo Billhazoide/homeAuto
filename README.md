@@ -9,7 +9,7 @@ and 8 channel relay module, TouchOSC apk for [Android](https://play.google.com/s
 [Windows](https://hexler.net/touchosc#windows), [Mac](https://hexler.net/touchosc#mac) or [Linux](https://hexler.net/touchosc#linux), to create the template with the commands and [TouchOSC bridge](https://hexler.net/pub/touchosc/touchosc-bridge-1.7.3.150-win32.exe)
 
 ### Setup.
-I use the Arduino IDE 1.8.1 to compile this code into arduino board, verification will display some warnings,
+I use the Arduino IDE 1.8.1 to compile this code in arduino board, verification will display some warnings,
 in my case did, but this will not prevent the code to work. You will need to design your own display with
 the right commands in TouchOSC Editor to trigger the arduino ports, i highly recommend to use external power
-supply to the relay module, otherwise he can present malfunctioning such as high delay or even work at all.
+supply to the relay module, otherwise he can present malfunctioning such as high delay or even't work at all.
