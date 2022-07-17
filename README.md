@@ -1,4 +1,5 @@
 # Home Automation.
+## Before compile to the board, switch to ".ino" extension.
 [![Arduino](https://img.shields.io/badge/Arduino-1.8.1-green.svg)]() [![NPM Version](https://img.shields.io/badge/TouchOSCEditor-1.1.4-blue)]() [![NODE VERSION](https://img.shields.io/badge/OSC-1.9.1-lightblue)]() [![NODEMON VERSION](https://img.shields.io/badge/TouchBrdge-1.7.3-orange)]()
 ### Description.
 Simple script to automate the house with Arduino and a smartphone.
