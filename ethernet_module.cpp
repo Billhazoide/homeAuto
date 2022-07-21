@@ -2,9 +2,6 @@
 #include <Ethernet.h>
 #include <SPI.h>
 
-// Potentiometer 
-int valPot= 0;
-
 //Set IP for the main automation server
 const byte myIp[]  = { 192, 168, 0, 10 };   
 
@@ -19,10 +16,6 @@ const int destPort = 9000;
 
 //Set arduino digital port
 const int DigitalPinCount = 14;
-
-//Alarm alert
-const int analogOutPin = 0; 
-int sensorValue = 0;
 
 // Initial state of the port, 1 = Off
 int flag2 = 1;
@@ -41,7 +34,6 @@ OSCServer server;
 OSCClient client;    
 
 void setup() {
-  Serial.begin(9600);
   
   //Start ethernet module interface
   Ethernet.begin(myMac, myIp);  
