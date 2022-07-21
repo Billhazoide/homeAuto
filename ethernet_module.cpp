@@ -66,10 +66,8 @@ void setup() {
 }
 
 void func10(OSCMessage *_mes){
-//  read osc request from android
+  // Request from OSC
   int value = (int)_mes -> getArgFloat(0);
-  
-  valPot = map(value, 0, 1023, 0, 255);
 
   // Create new osc message
   OSCMessage txMes;
@@ -79,10 +77,9 @@ void func10(OSCMessage *_mes){
   
   // Set OSC command
   txMes.beginMessage("/ard/digPin10");
-
-  Serial.println(valPot);
   
-  digitalWrite(13,value);
+  // Change value in 9 digi port
+  analogWrite(9,value);
   
   // Set port state in OSC message 
   txMes.addArgFloat(value);
