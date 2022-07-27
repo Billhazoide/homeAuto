@@ -1,6 +1,7 @@
 #include <ArdOSC.h>
 #include <Ethernet.h>
 #include <SPI.h>
+#include <IRremote.hpp>
 
 //Set IP for the main automation server
 const byte myIp[]  = { 192, 168, 0, 10 };   
@@ -15,7 +16,13 @@ const int serverPort  = 8000;
 const int destPort = 9000;
 
 //Set arduino digital port
-const int DigitalPinCount = 14;
+const int DigitalPinCount = 10;
+
+// Alarm, 0 === ON.
+int active = 0;
+
+//IR shit
+IRsend irsend;
 
 // Initial state of the port, 1 = Off
 int flag2 = 1;
@@ -34,14 +41,25 @@ OSCServer server;
 OSCClient client;    
 
 void setup() {
+  Serial.begin(9600);
+
+  // IR SHIT
+
+  // Just to know which program is running on my Arduino
+  Serial.println(F("START " __FILE__ " from " __DATE__ "\r\nUsing library version " VERSION_IRREMOTE));
+     
+  // Specify send pin and enable feedback LED at default feedback LED pin
+  IrSender.begin(3, ENABLE_LED_FEEDBACK);
   
-  //Start ethernet module interface
+//  Serial.println(F("Ready to send IR signals at pin 3"));
+
+  // Start ethernet module interface
   Ethernet.begin(myMac, myIp);  
 
-  //Start OSC server setting rx port
+  // Start OSC server setting rx port
   server.begin(serverPort);   
 
-  //Set callback function to oscaddress (routes)
+  // Set callback function to oscaddress (routes)
   // Those are for turn on/off relay channel 
   server.addCallback("/ard/relePin2", &func2); 
   server.addCallback("/ard/relePin3", &func3); 
@@ -50,45 +68,55 @@ void setup() {
   server.addCallback("/ard/relePin6", &func6); 
   server.addCallback("/ard/relePin7", &func7); 
   server.addCallback("/ard/relePin8", &func8); 
-  server.addCallback("/ard/relePin9", &func9); 
+//  server.addCallback("/ard/relePin9", &func9); 
+  // PWM  
   server.addCallback("/ard/digPin10", &func10);
 
-  // Call function
+  // IR tv signal relate
+  //  Arrow up  
+  server.addCallback("/ard/tvPin1", &func11);
+  //  Arrow left
+  server.addCallback("/ard/tvPin2", &func12);
+  //  Arrow down
+  server.addCallback("/ard/tvPin3", &func13);
+  //  Arrow right
+  server.addCallback("/ard/tvPin4", &func14);
+  //  OK button
+  server.addCallback("/ard/tvPin5", &func15);
+  //  Volume up/Down
+  server.addCallback("/ard/tvPin6", &func16);
+  //  Mute
+  server.addCallback("/ard/tvPin7", &func17);
+  //  Options
+  server.addCallback("/ard/tvPin8", &func18);
+//  //  Home
+  server.addCallback("/ard/tvPin9",&func19);
+  //  On/Off
+  server.addCallback("/ard/tvPin10",&func20);
+
+  // Call function to set pinMode
   setupPins();
-}
-
-void func10(OSCMessage *_mes){
-  // Request from OSC
-  int value = (int)_mes -> getArgFloat(0);
-
-  // Create new osc message
-  OSCMessage txMes;
-
-  // Set destination ip address & destination OSC port
-  txMes.setAddress(_mes->getIpAddress(), destPort);
-  
-  // Set OSC command
-  txMes.beginMessage("/ard/digPin10");
-  
-  // Change value in 9 digi port
-  analogWrite(10,value);
-  
-  // Set port state in OSC message 
-  txMes.addArgFloat(value);
-  
-  // Set port status in OSC message
-  txMes.addArgInt32(value);
-
-  // Send OSC message to client 
-  client.send(&txMes);
 }
   
 void loop(){
   // Check for any new OSC msg
   if(server.availableCheck()>0) {
-//     Serial.println("alive, mf! "); 
+  // Serial.println("alive, mf! "); 
   }
   
+  // Read magnetic sensor on Analog port 0
+  int alarm = analogRead(A0);
+
+  // If active and sensor readings higher than 0
+  // Relay will be activated with a siren.
+  if(active > 0 && alarm > 0){
+      Serial.println(Intruder!);
+      // Activating digital port 2
+      digitalWrite(2, 0);     
+    } else {
+      // Deactivating digital port 2
+      digitalWrite(2,1);
+    }
 }
 
 void setupPins(){
@@ -104,7 +132,7 @@ void func2(OSCMessage * _mes) {
   int value = (int)_mes -> getArgFloat(0);
 
   // Switch digital port value
-  digitalWrite(2, value);
+//  digitalWrite(2, value);
   
   // Create new osc message
   OSCMessage txMes;
@@ -120,10 +148,12 @@ void func2(OSCMessage * _mes) {
   
   if (flag2 == 1) {
     flag2 = 0;
-    digitalWrite(2, LOW);
+    active = 1;
+  // digitalWrite(2, LOW);
   } else {
     flag2 = 1;
-    digitalWrite(2, HIGH);
+    active = 0;
+  // digitalWrite(2, HIGH);
   }
   
   // Set port status in OSC message
@@ -152,7 +182,7 @@ void func3(OSCMessage * _mes) {
   txMes.beginMessage("/ard/relePin3");
   
   // Set port state in OSC message 
-  txMes.addArgFloat(flag3);
+  txMes.addArgFloat(value);
   
   if (flag3 == 1) {
     flag3 = 0;
@@ -163,7 +193,7 @@ void func3(OSCMessage * _mes) {
   }
   
   // Set port status in OSC message
-  txMes.addArgInt32(flag3);
+  txMes.addArgInt32(value);
 
   // Send OSC message to client 
   client.send(&txMes);
@@ -224,7 +254,7 @@ void func5(OSCMessage * _mes) {
   txMes.beginMessage("/ard/relePin5");
   
   // Set port state in OSC message 
-  txMes.addArgFloat(flag5);
+  txMes.addArgFloat(value);
   
   if (flag5 == 1) {
     flag5 = 0;
@@ -235,7 +265,7 @@ void func5(OSCMessage * _mes) {
   }
   
   // Set port status in OSC message
-  txMes.addArgInt32(flag5);
+  txMes.addArgInt32(value);
 
   // Send OSC message to client 
   client.send(&txMes);
@@ -260,7 +290,7 @@ void func6(OSCMessage * _mes) {
   txMes.beginMessage("/ard/relePin6");
   
   // Set port state in OSC message 
-  txMes.addArgFloat(flag6);
+  txMes.addArgFloat(value);
   
   if (flag6 == 1) {
     flag6 = 0;
@@ -271,7 +301,7 @@ void func6(OSCMessage * _mes) {
   }
   
   // Set port status in OSC message
-  txMes.addArgInt32(flag6);
+  txMes.addArgInt32(value);
 
   // Send OSC message to client 
   client.send(&txMes);
@@ -380,4 +410,89 @@ void func9(OSCMessage * _mes) {
 
   // Send OSC message to client 
   client.send(&txMes);
+}
+
+void func10(OSCMessage *_mes){
+//  read osc request from android
+  int value = (int)_mes -> getArgFloat(0);
+
+  // Create new osc message
+  OSCMessage txMes;
+
+  // Set destination ip address & destination OSC port
+  txMes.setAddress(_mes->getIpAddress(), destPort);
+  
+  // Set OSC command
+  txMes.beginMessage("/ard/digPin10");
+
+  analogWrite(10,value);
+  
+  // Set port state in OSC message 
+  txMes.addArgFloat(value);
+  
+  // Set port status in OSC message
+  txMes.addArgInt32(value);
+
+  // Send OSC message to client 
+  client.send(&txMes);
+}
+
+// Arrow up
+void func11(){
+  IrSender.sendRC6(0x0, 0x10058, 0, true);
+}
+
+// Arrow left
+void func12(){
+  IrSender.sendRC6(0x0, 0x1005A, 0, true);
+}
+
+// Arrow down
+void func13(){
+  IrSender.sendRC6(0x0, 0x10059, 0, true);
+}
+
+// Arrow right
+void func14(){
+  IrSender.sendRC6(0x0, 0x1005B, 0, true);
+}
+
+// OK
+void func15(){
+  IrSender.sendRC6(0x0, 0x1005C, 0, true);
+}
+
+// Increase/decrease tv volume
+void func16(OSCMessage *_mes){
+  int value = (int)_mes -> getArgFloat(0);
+  
+  int previousValue = 50; 
+  
+  if(value <= previousValue){
+    // Volume down
+    IrSender.sendRC6(0x0, 0x10011, 0, true);
+  } else {
+    // Volume up
+    IrSender.sendRC6(0x0, 0x10010, 0, true);
+  }
+}
+
+// Mute
+void func17(){
+  IrSender.sendRC6(0x0, 0x1000D, 0, true);
+}
+
+// Options
+void func18(){
+  IrSender.sendRC6(0x0, 0x10040, 0, true);
+}
+
+// Home
+void func19(){
+  IrSender.sendRC6(0x0, 0x10054, 0, true);
+}
+
+// On/Off
+void func20(){
+  IrSender.sendRC6(0x0, 0x1000C, 0, true);
 }
