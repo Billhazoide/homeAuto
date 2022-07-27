@@ -71,7 +71,7 @@ void func10(OSCMessage *_mes){
   txMes.beginMessage("/ard/digPin10");
   
   // Change value in 9 digi port
-  analogWrite(9,value);
+  analogWrite(10,value);
   
   // Set port state in OSC message 
   txMes.addArgFloat(value);
