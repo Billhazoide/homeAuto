@@ -16,7 +16,7 @@ const int serverPort  = 8000;
 const int destPort = 9000;
 
 //Set arduino digital port
-const int DigitalPinCount = 10;
+const int DigitalPinCount = 6;
 
 // Alarm, 0 === ON.
 int active = 0;
@@ -86,7 +86,6 @@ void setup() {
   // Volume up/Down
   server.addCallback("/ard/tvFunc6", &func16);
   server.addCallback("/ard/tvFunc7", &func17);
-
   // Mute
   server.addCallback("/ard/tvFunc8", &func18);
   // Options
