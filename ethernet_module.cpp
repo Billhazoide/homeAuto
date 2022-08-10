@@ -25,14 +25,14 @@ int active = 0;
 IRsend irsend;
 
 // Initial state of the port, 1 = Off
-int flag2 = 1;
-int flag3 = 1;
-int flag4 = 1;
-int flag5 = 1;
-int flag6 = 1;
-int flag7 = 1;
-int flag8 = 1;
-int flag9 = 1;
+int flag2 = 0;
+int flag3 = 0;
+int flag4 = 0;
+int flag5 = 0;
+int flag6 = 0;
+int flag7 = 0;
+int flag8 = 0;
+int flag9 = 0;
 
 //Start OSC server (tread with rx OSC msg)
 OSCServer server;    
@@ -46,12 +46,12 @@ void setup() {
   // IR SHIT
 
   // Just to know which program is running on my Arduino
-  Serial.println(F("START " __FILE__ " from " __DATE__ "\r\nUsing library version " VERSION_IRREMOTE));
+  // Serial.println(F("START " __FILE__ " from " __DATE__ "\r\nUsing library version " VERSION_IRREMOTE));
      
   // Specify send pin and enable feedback LED at default feedback LED pin
   IrSender.begin(3, ENABLE_LED_FEEDBACK);
   
-//  Serial.println(F("Ready to send IR signals at pin 3"));
+  // Serial.println(F("Ready to send IR signals at pin 3"));
 
   // Start ethernet module interface
   Ethernet.begin(myMac, myIp);  
@@ -68,33 +68,35 @@ void setup() {
   server.addCallback("/ard/relePin6", &func6); 
   server.addCallback("/ard/relePin7", &func7); 
   server.addCallback("/ard/relePin8", &func8); 
-//  server.addCallback("/ard/relePin9", &func9); 
+  
   // PWM  
+  server.addCallback("/ard/relePin9", &func9); 
   server.addCallback("/ard/digPin10", &func10);
 
   // IR tv signal relate
-  //  Arrow up  
+  // Arrow up  
   server.addCallback("/ard/tvPin1", &func11);
-  //  Arrow left
+  // Arrow left
   server.addCallback("/ard/tvPin2", &func12);
-  //  Arrow down
+  // Arrow down
   server.addCallback("/ard/tvPin3", &func13);
-  //  Arrow right
+  // Arrow right
   server.addCallback("/ard/tvPin4", &func14);
-  //  OK button
+  // OK button
   server.addCallback("/ard/tvPin5", &func15);
-  //  Volume up/Down
+  // Volume up/Down
   server.addCallback("/ard/tvPin6", &func16);
-  //  Mute
+  // Mute
   server.addCallback("/ard/tvPin7", &func17);
-  //  Options
+  // Options
   server.addCallback("/ard/tvPin8", &func18);
-//  //  Home
+  // Home
   server.addCallback("/ard/tvPin9",&func19);
-  //  On/Off
+  // On/Off
   server.addCallback("/ard/tvPin10",&func20);
 
   // Call function to set pinMode
+  // Set pins OUTPUT 2 to 10
   setupPins();
 }
   
@@ -104,19 +106,17 @@ void loop(){
   // Serial.println("alive, mf! "); 
   }
   
+  // ALARM TEST SHITS
   // Read magnetic sensor on Analog port 0
-  int alarm = analogRead(A0);
+  // int alarm = analogRead(A0);
 
-  // If active and sensor readings higher than 0
-  // Relay will be activated with a siren.
-  if(active > 0 && alarm > 0){
-      Serial.println(Intruder!);
-      // Activating digital port 2
-      digitalWrite(2, 0);     
-    } else {
-      // Deactivating digital port 2
-      digitalWrite(2,1);
-    }
+  // // If active and sensor readings higher than 0
+  // // Relay will be activated with a siren.
+  // if(active > 0 && alarm > 0){
+  //     Serial.println(Intruder!);
+  //     // Activating digital port 2
+  //     digitalWrite(2, LOW);     
+  //   }
 }
 
 void setupPins(){
@@ -132,7 +132,7 @@ void func2(OSCMessage * _mes) {
   int value = (int)_mes -> getArgFloat(0);
 
   // Switch digital port value
-//  digitalWrite(2, value);
+  digitalWrite(2, value);
   
   // Create new osc message
   OSCMessage txMes;
@@ -148,12 +148,12 @@ void func2(OSCMessage * _mes) {
   
   if (flag2 == 1) {
     flag2 = 0;
-    active = 1;
-  // digitalWrite(2, LOW);
+    // active = 1;
+    digitalWrite(2, LOW);
   } else {
     flag2 = 1;
-    active = 0;
-  // digitalWrite(2, HIGH);
+    // active = 0;
+    digitalWrite(2, HIGH);
   }
   
   // Set port status in OSC message
@@ -165,6 +165,7 @@ void func2(OSCMessage * _mes) {
 
 
 // Tread OSC message
+// Ambient light (LED tape/Abajour)
 void func3(OSCMessage * _mes) { 
   // Store value the args from OSC client
   int value = (int)_mes -> getArgFloat(0);
@@ -183,15 +184,9 @@ void func3(OSCMessage * _mes) {
   
   // Set port state in OSC message 
   txMes.addArgFloat(value);
-  
-  if (flag3 == 1) {
-    flag3 = 0;
-    digitalWrite(3, LOW);
-  } else {
-    flag3 = 1;
-    digitalWrite(3, HIGH);
-  }
-  
+
+  analogWrite(3, value);
+
   // Set port status in OSC message
   txMes.addArgInt32(value);
 
@@ -256,14 +251,8 @@ void func5(OSCMessage * _mes) {
   // Set port state in OSC message 
   txMes.addArgFloat(value);
   
-  if (flag5 == 1) {
-    flag5 = 0;
-    digitalWrite(5, LOW);
-  } else {
-    flag5 = 1;
-    digitalWrite(5, HIGH);
-  }
-  
+  analogWrite(5, value);
+
   // Set port status in OSC message
   txMes.addArgInt32(value);
 
@@ -413,7 +402,7 @@ void func9(OSCMessage * _mes) {
 }
 
 void func10(OSCMessage *_mes){
-//  read osc request from android
+  // read osc request from android
   int value = (int)_mes -> getArgFloat(0);
 
   // Create new osc message
