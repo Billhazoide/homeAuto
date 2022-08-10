@@ -75,25 +75,27 @@ void setup() {
 
   // IR tv signal relate
   // Arrow up  
-  server.addCallback("/ard/tvPin1", &func11);
+  server.addCallback("/ard/tvFunc1", &func11);
   // Arrow left
-  server.addCallback("/ard/tvPin2", &func12);
+  server.addCallback("/ard/tvFunc2", &func12);
   // Arrow down
-  server.addCallback("/ard/tvPin3", &func13);
+  server.addCallback("/ard/tvFunc3", &func13);
   // Arrow right
-  server.addCallback("/ard/tvPin4", &func14);
+  server.addCallback("/ard/tvFunc4", &func14);
   // OK button
-  server.addCallback("/ard/tvPin5", &func15);
+  server.addCallback("/ard/tvFunc5", &func15);
   // Volume up/Down
-  server.addCallback("/ard/tvPin6", &func16);
+  server.addCallback("/ard/tvFunc6", &func16);
+  server.addCallback("/ard/tvFunc7", &func17);
+
   // Mute
-  server.addCallback("/ard/tvPin7", &func17);
+  server.addCallback("/ard/tvFunc8", &func18);
   // Options
-  server.addCallback("/ard/tvPin8", &func18);
+  server.addCallback("/ard/tvFunc9", &func19);
   // Home
-  server.addCallback("/ard/tvPin9",&func19);
+  server.addCallback("/ard/tvFunc10",&func20);
   // On/Off
-  server.addCallback("/ard/tvPin10",&func20);
+  server.addCallback("/ard/tvFunc11",&func21);
 
   // Call function to set pinMode
   // Set pins OUTPUT 2 to 10
@@ -451,37 +453,32 @@ void func15(){
   IrSender.sendRC6(0x0, 0x1005C, 0, true);
 }
 
-// Increase/decrease tv volume
-void func16(OSCMessage *_mes){
-  int value = (int)_mes -> getArgFloat(0);
-  
-  int previousValue = 50; 
-  
-  if(value <= previousValue){
-    // Volume down
-    IrSender.sendRC6(0x0, 0x10011, 0, true);
-  } else {
-    // Volume up
-    IrSender.sendRC6(0x0, 0x10010, 0, true);
-  }
+// TV Volume up
+void func16(){  
+  IrSender.sendRC6(0x0, 0x10010, 0, true);
+}
+
+// TV Volume down
+void func17(){
+  IrSender.sendRC6(0x0, 0x10011, 0, true);
 }
 
 // Mute
-void func17(){
+void func18(){
   IrSender.sendRC6(0x0, 0x1000D, 0, true);
 }
 
 // Options
-void func18(){
+void func19(){
   IrSender.sendRC6(0x0, 0x10040, 0, true);
 }
 
 // Home
-void func19(){
+void func20(){
   IrSender.sendRC6(0x0, 0x10054, 0, true);
 }
 
 // On/Off
-void func20(){
+void func21(){
   IrSender.sendRC6(0x0, 0x1000C, 0, true);
 }
