@@ -1,9 +1,10 @@
 # Home Automation.
 ## Libraries to use
-[![IRremote](https://img.shields.io/badge/IRremote-3.5.0-lightred.svg)]()
+[![IRremote](https://img.shields.io/badge/IRremote-3.5.0-red.svg)]()
 [![ArdOsc](https://img.shields.io/badge/ArdOsc-2.2.0-lightblue)]()
 [![Ethernet](https://img.shields.io/badge/Ethernet-1.1.2-lightgreen)]()
 
+:shipit:
 ## Before compile to the board, switch to ".ino" extension.
 [![Arduino](https://img.shields.io/badge/Arduino-1.8.1-green.svg)]() [![NPM Version](https://img.shields.io/badge/TouchOSCEditor-1.8.9-blue)]() [![NODE VERSION](https://img.shields.io/badge/TouchOSC-1.9.1-lightblue)]() [![NODEMON VERSION](https://img.shields.io/badge/TouchBridge-1.7.3-orange)]()
 ### Description.
